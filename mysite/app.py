@@ -7,9 +7,11 @@ app = Flask(__name__)
 def index():
     return render_template('home.html')
 
-@app.route("/explore")
+@app.route("/find")
 def explore():
-    return ("top 5 share-code of past 1 day, 1 week, 1 month for each category like routes, livery, tune etc")
+    return ("<p>find share-codes by time 1 day, 1 week, 1 month etc</p><br>\
+            <p>find share-codes by category like routes, livery, tune etc</p><br>\
+            <p>find share-codes by popularity like top, rising, hot, trending etc</p>")
 
 @app.route("/search")
 def search():
