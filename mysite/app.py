@@ -8,11 +8,11 @@ def index():
     return render_template('home.html')
 
 @app.route("/explore")
-def submit():
+def explore():
     return ("top 5 share-code of past 1 day, 1 week, 1 month for each category like routes, livery, tune etc")
 
 @app.route("/search")
-def submit():
+def search():
     return ("share-code search form")
 
 @app.route("/submit")
