@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+
+{% block body%}
+  <main>
+    <section class="py-5 text-center container">
+      <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+          <h1 class="fw-light">Explore</h1>
+          <div class="lead text-muted">
+            <p>Find share-codes by time 1 day, 1 week, 1 month etc.</p>
+            <p>Find share-codes by category like routes, livery, tune etc.</p>
+            <p>Find share-codes by popularity like top, rising, hot, trending etc.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+      <div class="container px-4 py-5" id="custom-cards">
+        <div class="row row-cols-lg-3 align-items-stretch g-4 py-5">
+          {% for item in share_codes_data %}
+          <a class="text-decoration-none" href="/code/{{ item['unique_id'] }}">
+            <div class="col">
+              <div class="card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg" focusable="true" style="background-image: url('{{ item['preview_img_url'] }}');">
+                <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+                  <h2 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">{{ item['title'] }}</h2>
+                  <ul class="d-flex list-unstyled mt-auto">
+                    <li class="d-flex align-items-center">
+                      <svg class="bi me-2" width="1em" height="1em"><use xlink:href="#calendar3"></use></svg>
+                      <small>{{ item['date'] }}</small>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+  </main>
+{% endblock %}
