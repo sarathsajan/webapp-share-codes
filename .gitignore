@@ -27,6 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+env_vars/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -129,6 +130,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# environment variables, API keys and secrets
-env_vars.py

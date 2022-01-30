@@ -1,13 +1,34 @@
-from __future__ import unicode_literals
-from flask import Flask, render_template
-import os
-import random
+# Import core libraries
+from functools import wraps
+from flask import Flask, render_template, redirect, url_for, request, session
 
+# Import helper libraries and environment variables
+#from users import User
 import _functions
 import data
 share_codes_data = data.Data()
+from env_vars.env_vars import ENV_VARS
+ENV_VARIABLES = ENV_VARS()
 
+# Import and initialise the Google Cloud Firestore database
+import gcfsDB
+
+# Import libraries for Google Sign-in and session creation/management/deletion
+import g_auth_session
+
+# Initialise Flask app
 app = Flask(__name__)
+app.secret_key = ENV_VARIABLES["FLASK_SECRET_KEY"]
+
+# Check if user is logged-in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+    return wrap
 
 
 @app.route("/")
@@ -26,17 +47,49 @@ def search():
 
 @app.route("/submit")
 def submit():
-    return ("share-code submission form")
+    return render_template('submit.html')
 
 @app.route("/code/<string:unique_id>")
 def code(unique_id):
     return render_template("code.html", share_codes_data=share_codes_data, unique_id=unique_id)
 
+@app.route("/login")
+def login():
+    request_uri = g_auth_session.login_with_google(request)
+    return redirect(request_uri)
+
+@app.route("/login/callback")
+def callback():
+    # Get authorization code Google sent back to you
+    code = request.args.get("code")
+    user_data = g_auth_session.start_google_authentication(request, code)
+
+    if not user_data['msg']:
+        return ('Google Authentication Error')
+    
+    # Doesn't exist? Add it to the database.
+    if not gcfsDB.if_user_data_exists_gcfsDB(user_data):
+        gcfsDB.set_user_data_gcfsDB(user_data)
+
+    # Begin user session by logging the user in
+    session['logged_in'] = True
+    session['user_data'] = user_data
+    
+    # Send user back to homepage
+    return redirect(url_for("submit"))
+
+
+@app.route("/logout")
+@is_logged_in
+def logout():
+    session.clear()
+    return redirect(url_for("submit"))
+
 
 @app.route("/about")
+@is_logged_in
 def about():
     return render_template("about.html")
 
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, ssl_context="adhoc")
