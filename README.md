@@ -1,5 +1,11 @@
 # Project FHSC
 A simple webapp for sharing Forza Horizon share-codes
 
-![Home Page](index_image.png)
+`Desktop`
 
+![Home Page](index_desktop_image.png)
+
+<br>
+
+`Mobile`
+![Home Page](index_mobile_image.jpg)
