@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block body%}
+
+    {% if session.logged_in %}
+        <div class="container">
+            <p>share-code submission form. If you are seeing this, then Google authentication was successful</p>
+            <p>Hello, {{ session['user_data']['users_name'] }}! You're logged in! Email: {{ session['user_data']['users_email'] }}</p>
+            <p>Google Profile Picture:</p>
+            <img src="{{ session['user_data']['picture'] }}" alt="Google profile pic"></img></div>
+            <a class="button" href="/logout">Logout</a>
+        </div>
+    {% else %}
+        <div class="container">
+            <p> Please <a href="/authenticate">click here authenticate</a>, to view 'My Profile'</p>
+        </div>
+    {% endif %}
+
+{% endblock %}

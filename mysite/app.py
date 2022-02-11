@@ -27,7 +27,7 @@ def is_logged_in(f):
         if 'logged_in' in session:
             return f(*args, **kwargs)
         else:
-            return redirect(url_for('login'))
+            return redirect(url_for('authentication'))
     return wrap
 
 
@@ -46,12 +46,17 @@ def search():
     return ("share-code search form")
 
 @app.route("/submit")
+@is_logged_in
 def submit():
     return render_template('submit.html')
 
-@app.route("/code/<string:unique_id>")
-def code(unique_id):
-    return render_template("code.html", share_codes_data=share_codes_data, unique_id=unique_id)
+@app.route("/code/<string:game_name_year><string:share_code>")
+def code(share_code):
+    return render_template("code.html", share_codes_data=share_codes_data, unique_id=share_code ) # unique is dummy data for now
+
+@app.route("/authentication")
+def authentication():
+    return render_template("auth.html")
 
 @app.route("/login")
 def login():
@@ -78,6 +83,11 @@ def callback():
     # Send user back to homepage
     return redirect(url_for("submit"))
 
+@app.route("/profile/<string:unique_user_id>")
+@is_logged_in
+def profile():
+    return render_template('submit.html')
+
 
 @app.route("/logout")
 @is_logged_in
@@ -92,4 +102,4 @@ def about():
     return render_template("about.html")
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, ssl_context='adhoc')

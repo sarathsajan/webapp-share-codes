@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block body%}
+    <div class="container d-flex min-vh-100">
+        <div class="container d-flex flex-column justify-content-center align-items-center">
+            <p>Not signed in, pls sign in with google</p>
+            <a href="/login">
+                <img src="{{ url_for('static', filename='images/google_signin_buttons/web/1x/btn_google_signin_dark_normal_web.png') }}" />
+            </a>
+        </div>
+    </div>
+{% endblock %}
