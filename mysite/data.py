@@ -2,7 +2,7 @@ def Data():
     sharecodes = [
         {
             'unique_id': '1',
-            'game': 'forza_horizon_4_2018',
+            'game': 'Forza Horizon 4',
             'code': '123456789',
             'title': 'My First ShareCODe',
             'description': 'provide optional description about the share code is less than dont-make-it-boooooring words.',
@@ -16,7 +16,7 @@ def Data():
         },
         {
             'unique_id': '2',
-            'game': 'forza_horizon_5_2018',
+            'game': 'Forza Horizon 5',
             'code': '123789456',
             'title': 'My next best Sharec0de',
             'description': 'HAHAHA Car Go Brrrrrrrrr',
@@ -44,7 +44,7 @@ def Data():
         },
         {
             'unique_id': "4a5g6",
-            'game': 'forza_horizon_5_2018',
+            'game': 'forza_horizon_4_2018',
             'code': '123489456',
             'title': 'marvel uyir',
             'description': 'iron man dies lol',

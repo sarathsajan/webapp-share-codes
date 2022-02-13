@@ -29,3 +29,12 @@ def if_user_data_exists_gcfsDB(user_data):
         return True
     else:
         return False
+
+def get_single_share_code_data(game_name, share_code):
+    docs = gcfsDB.collection('share_codes').where('game', '==', game_name).where('sharecode', '==', share_code).stream()
+    results = []
+    if docs:
+        for item in docs:
+            results.append(item.to_dict())
+        return results
+    return False

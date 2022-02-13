@@ -39,20 +39,26 @@ def index():
 
 @app.route("/explore")
 def explore():
-    return render_template("explore.html", share_codes_data=share_codes_data)
+    return render_template("explore.html", share_codes_data=share_codes_data) # show top picks of the day, week, month, all-time
 
 @app.route("/search")
 def search():
-    return ("share-code search form")
+    return render_template("search.html") # basically a form that has all the input fields like in the game
+
+@app.route("/results")
+def results():
+    return render_template("results.html", share_codes_data="dummy_data")
+
+@app.route("/view/<game_name>/<int:share_code>")
+def view_single_share_code(game_name, share_code):
+    single_share_code = gcfsDB.get_single_share_code_data(game_name=game_name, share_code=share_code)
+    return render_template('view_share_code.html', share_codes_data=single_share_code)
+
 
 @app.route("/submit")
 @is_logged_in
 def submit():
     return render_template('submit.html')
-
-@app.route("/code/<string:game_name_year><string:share_code>")
-def code(share_code):
-    return render_template("code.html", share_codes_data=share_codes_data, unique_id=share_code ) # unique is dummy data for now
 
 @app.route("/authentication")
 def authentication():
@@ -80,20 +86,20 @@ def callback():
     session['logged_in'] = True
     session['user_data'] = user_data
     
-    # Send user back to homepage
-    return redirect(url_for("submit"))
+    # Send user to profile page
+    return redirect(url_for("profile_myself"))
 
-@app.route("/profile/<string:unique_user_id>")
+@app.route("/profile/myself")
 @is_logged_in
-def profile():
-    return render_template('submit.html')
+def profile_myself():
+    return render_template('profile.html')
 
 
 @app.route("/logout")
 @is_logged_in
 def logout():
     session.clear()
-    return redirect(url_for("submit"))
+    return redirect(url_for("login"))
 
 
 @app.route("/about")
