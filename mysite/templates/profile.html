@@ -4,11 +4,29 @@
 
     {% if session.logged_in %}
         <div class="container">
-            <p>share-code submission form. If you are seeing this, then Google authentication was successful</p>
-            <p>Hello, {{ session['user_data']['users_name'] }}! You're logged in! Email: {{ session['user_data']['users_email'] }}</p>
-            <p>Google Profile Picture:</p>
-            <img src="{{ session['user_data']['picture'] }}" alt="Google profile pic"></img></div>
-            <a class="button" href="/logout">Logout</a>
+            <div class="container p-5 mb-4 bg-light rounded-3"> 
+                <img src="{{ session['user_data']['picture'] }}" alt="Google profile pic"></img>
+                <p class="display-5 fw-bold">{{ session['user_data']['users_name'] }}</p>
+                <p class="col-md-8">Creations: 61</p>
+                <p class="col-md-8">Followers: 584</p>
+                <p class="col-md-8">Following: 12</p>
+            </div>
+        </div>
+        <div class="container">
+            <div class="container p-5 mb-4 bg-light rounded-3">
+                <p class="display-6">My Submissions</p>
+                <p class="col-md-8">Creations: 61</p>
+                <p class="col-md-8">Followers: 584</p>
+                <p class="col-md-8">Following: 12</p>
+            </div>
+        </div>
+        <div class="container">
+            <div class="container p-5 mb-4 bg-light rounded-3">
+                <p class="display-6">My Bookmarks</p>
+                <p class="col-md-8">Creations: 61</p>
+                <p class="col-md-8">Followers: 584</p>
+                <p class="col-md-8">Following: 12</p>
+            </div>
         </div>
     {% else %}
         <div class="container">

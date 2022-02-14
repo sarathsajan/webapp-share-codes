@@ -54,7 +54,6 @@ def view_single_share_code(game_name, share_code):
     single_share_code = gcfsDB.get_single_share_code_data(game_name=game_name, share_code=share_code)
     return render_template('view_share_code.html', share_codes_data=single_share_code)
 
-
 @app.route("/submit")
 @is_logged_in
 def submit():
@@ -99,7 +98,7 @@ def profile_myself():
 @is_logged_in
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for("authentication"))
 
 
 @app.route("/about")

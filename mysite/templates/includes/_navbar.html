@@ -1,4 +1,4 @@
-  <nav class="navbar navbar-expand-md navbar-light bg-light" aria-label="Eighth navbar example">
+  <nav class="navbar navbar-expand-md navbar-light bg-light border-bottom mb-4" aria-label="Eighth navbar example">
     <div class="container">
       <a class="navbar-brand" href="/"><strong>FHSC</strong></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
@@ -14,15 +14,26 @@
             <a class="nav-link" href="/submit">Submit</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" target="_blank" href="https://github.com/sarathsajan/webapp-share-codes">Github Repo</a>
+            <a class="nav-link" href="/search">Search</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/about">About</a>
+            <a class="nav-link" target="_blank" href="https://github.com/sarathsajan/webapp-share-codes">Github Repo</a>
           </li>
         </ul>
-        <form data-dashlane-rid="7d1fc71a68148621">
-          <input class="form-control" type="text" placeholder="Search" aria-label="Search" data-dashlane-rid="648ae5101aff869e">
-        </form>
+        <ul class="navbar-nav">
+          {% if session.logged_in %}
+            <li class="nav-item">
+              <a class="nav-link" href="/profile/myself">My Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="/authentication">Login</a>
+            </li>
+          {% endif %}
+        </ul>
       </div>
     </div>
   </nav>
