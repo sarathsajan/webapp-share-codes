@@ -1,9 +1,9 @@
 # Import core libraries
+from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
-from flask import Flask, render_template, redirect, url_for, request, session
+from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
 
 # Import helper libraries and environment variables
-#from users import User
 import _functions
 import data
 share_codes_data = data.Data()
@@ -13,7 +13,7 @@ ENV_VARIABLES = ENV_VARS()
 # Import and initialise the Google Cloud Firestore database
 import gcfsDB
 
-# Import libraries for Google Sign-in and session creation/management/deletion
+# Import libraries for Google Sign-in and creation/management/deletion of session
 import g_auth_session
 
 # Initialise Flask app
@@ -54,10 +54,30 @@ def view_single_share_code(game_name, share_code):
     single_share_code = gcfsDB.get_single_share_code_data(game_name=game_name, share_code=share_code)
     return render_template('view_share_code.html', share_codes_data=single_share_code)
 
-@app.route("/submit")
+# Create a Submission Form using WTForms
+class SubmissionForm(Form):
+    share_code = IntegerField('Share code', validators=[validators.input_required(), validators.NumberRange(min=100000000, max=999999999)])
+    title  = StringField('Title', validators=[validators.input_required(), validators.Length(min=5, max=50)])
+    game_name = SelectField('Game', choices=['Forza Horizon 4', 'Forza Horizon 5'], validators=[validators.input_required()])
+    preview_img_url = StringField('Preview Image URL', validators=[validators.optional(), validators.Length(max=600)])
+    yt_video_url = StringField('YouTube Video URL', validators=[validators.optional(), validators.Length(max=100)])
+    description = TextAreaField('Tell why would people enjoy your share code', validators=[validators.input_required(), validators.Length(min=10, max=300)])
+
+@app.route("/submit", methods=['GET', 'POST'])
 @is_logged_in
 def submit():
-    return render_template('submit.html')
+    form = SubmissionForm(request.form)
+    if request.method == 'POST' and form.validate():
+        share_code = form.share_code.data
+        title = form.title.data
+        game_name = form.game_name.data
+        preview_img_url = form.preview_img_url.data
+        yt_video_url = form.yt_video_url.data
+        description = form.description.data
+
+        share_code_submission_candidate = 'PUT_gcfsDB_function_to_add_this_share_code_to_the_database_if_theShare_code_doesnt_exist_already'
+        return redirect(url_for("profile_myself"))
+    return render_template('submit.html', form=form)
 
 @app.route("/authentication")
 def authentication():
