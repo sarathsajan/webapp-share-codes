@@ -1,4 +1,5 @@
 # Import core libraries
+from genericpath import exists
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
 from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
@@ -52,13 +53,14 @@ def results():
 @app.route("/view/<game_name>/<int:share_code>")
 def view_single_share_code(game_name, share_code):
     single_share_code = gcfsDB.get_single_share_code_data(game_name=game_name, share_code=share_code)
+    print(single_share_code)
     return render_template('view_share_code.html', share_codes_data=single_share_code)
 
 # Create a Submission Form using WTForms
 class SubmissionForm(Form):
     share_code = IntegerField('Share code', validators=[validators.input_required(), validators.NumberRange(min=100000000, max=999999999)])
     title  = StringField('Title', validators=[validators.input_required(), validators.Length(min=5, max=50)])
-    game_name = SelectField('Game', choices=['Forza Horizon 4', 'Forza Horizon 5'], validators=[validators.input_required()])
+    game = SelectField('Game', choices=['forza_horizon_4', 'forza_horizon_5'], validators=[validators.input_required()])
     preview_img_url = StringField('Preview Image URL', validators=[validators.optional(), validators.Length(max=600)])
     yt_video_url = StringField('YouTube Video URL', validators=[validators.optional(), validators.Length(max=100)])
     description = TextAreaField('Tell why would people enjoy your share code', validators=[validators.input_required(), validators.Length(min=10, max=300)])
@@ -68,15 +70,19 @@ class SubmissionForm(Form):
 def submit():
     form = SubmissionForm(request.form)
     if request.method == 'POST' and form.validate():
-        share_code = form.share_code.data
-        title = form.title.data
-        game_name = form.game_name.data
-        preview_img_url = form.preview_img_url.data
-        yt_video_url = form.yt_video_url.data
-        description = form.description.data
-
-        share_code_submission_candidate = 'PUT_gcfsDB_function_to_add_this_share_code_to_the_database_if_theShare_code_doesnt_exist_already'
-        return redirect(url_for("profile_myself"))
+        share_code_candidate = {
+            'share_code' : form.share_code.data,
+            'title' : form.title.data,
+            'game' : form.game.data,
+            'preview_img_url' : form.preview_img_url.data,
+            'embed_yt_url' : form.yt_video_url.data,
+            'description' : form.description.data
+        }
+        does_it_exist_flag = gcfsDB.check_and_add_share_code_gcfsDB(share_code_candidate)
+        if does_it_exist_flag == 'exists':
+            return redirect(url_for("about"))
+        else:
+            return redirect(url_for("profile_myself"))
     return render_template('submit.html', form=form)
 
 @app.route("/authentication")
