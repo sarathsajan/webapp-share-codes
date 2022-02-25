@@ -43,4 +43,6 @@ def get_single_share_code_data(game, share_code):
 def check_and_add_share_code_gcfsDB(share_code_candidate):
     if get_single_share_code_data(share_code_candidate['game'], share_code_candidate['share_code']):
         return 'exists'
-    pass
+    else:
+        doc_ref = gcfsDB.collection('share_codes')
+        doc_ref.add(share_code_candidate)

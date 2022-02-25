@@ -1,5 +1,5 @@
 # Import core libraries
-from genericpath import exists
+import datetime
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
 from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
@@ -50,9 +50,9 @@ def search():
 def results():
     return render_template("results.html", share_codes_data="dummy_data")
 
-@app.route("/view/<game_name>/<int:share_code>")
-def view_single_share_code(game_name, share_code):
-    single_share_code = gcfsDB.get_single_share_code_data(game_name=game_name, share_code=share_code)
+@app.route("/view/<game>/<int:share_code>")
+def view_single_share_code(game, share_code):
+    single_share_code = gcfsDB.get_single_share_code_data(game=game, share_code=share_code)
     print(single_share_code)
     return render_template('view_share_code.html', share_codes_data=single_share_code)
 
@@ -76,10 +76,12 @@ def submit():
             'game' : form.game.data,
             'preview_img_url' : form.preview_img_url.data,
             'embed_yt_url' : form.yt_video_url.data,
-            'description' : form.description.data
+            'description' : form.description.data,
+            'author': session['user_data']['users_name'],
+            'date': datetime.datetime.now(),
         }
-        does_it_exist_flag = gcfsDB.check_and_add_share_code_gcfsDB(share_code_candidate)
-        if does_it_exist_flag == 'exists':
+        submit_flag = gcfsDB.check_and_add_share_code_gcfsDB(share_code_candidate)
+        if submit_flag == 'exists':
             return redirect(url_for("about"))
         else:
             return redirect(url_for("profile_myself"))
