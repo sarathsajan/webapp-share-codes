@@ -23,7 +23,10 @@
         <ul class="navbar-nav">
           {% if session.logged_in %}
             <li class="nav-item">
-              <a class="nav-link" href="/profile/myself">My Profile</a>
+              <a class="nav-link" href="/profile/myself">
+                <img src="{{ session['user_data']['picture'] }}" alt="Google profile pic" height=25vh></img>
+                My Profile
+              </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>

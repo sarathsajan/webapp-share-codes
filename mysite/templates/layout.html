@@ -16,8 +16,11 @@
     <script src="/docs/5.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <title>Forza Horizon share-codes</title>
   </head>
-  {% include 'includes/_navbar.html' %}
   <body class="d-flex flex-column min-vh-100">
+    {% include 'includes/_navbar.html' %}
+    <div class="container">
+      {% include 'includes/_messages.html' %}
+    </div>
     {% block body%}
     {% endblock %}
   </body>

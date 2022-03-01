@@ -82,8 +82,10 @@ def submit():
         }
         submit_flag = gcfsDB.check_and_add_share_code_gcfsDB(share_code_candidate)
         if submit_flag == 'exists':
-            return redirect(url_for("about"))
+            flash('That share code already exists', category='danger')
+            return redirect(url_for('submit'))
         else:
+            flash('Your share code has been added', category='success')
             return redirect(url_for("profile_myself"))
     return render_template('submit.html', form=form)
 
