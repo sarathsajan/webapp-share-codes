@@ -61,6 +61,10 @@ class SubmissionForm(Form):
     share_code = IntegerField('Share code', validators=[validators.input_required(), validators.NumberRange(min=100000000, max=999999999)])
     title  = StringField('Title', validators=[validators.input_required(), validators.Length(min=5, max=50)])
     game = SelectField('Game', choices=['forza_horizon_4', 'forza_horizon_5'], validators=[validators.input_required()])
+    share_code_type = SelectField('Share code type', choices=['Select', 'event_lab', 'vinyl_group', 'livery_design'], validators=[validators.input_required(), validators.Length(min=7)])
+    event_lab_season = SelectField('Season', choices=['Select', 'hot','wet','storm','dry'], validators=[validators.Optional()])
+    event_lab_racing_series = SelectField('Racing Series', choices=['Select', 'road','dirt','cross_country','drag'], validators=[validators.Optional()])
+    
     preview_img_url = StringField('Preview Image URL', validators=[validators.optional(), validators.Length(max=600)])
     yt_video_url = StringField('YouTube Video URL', validators=[validators.optional(), validators.Length(max=100)])
     description = TextAreaField('Tell why would people enjoy your share code', validators=[validators.input_required(), validators.Length(min=10, max=300)])
@@ -74,6 +78,9 @@ def submit():
             'share_code' : form.share_code.data,
             'title' : form.title.data,
             'game' : form.game.data,
+            'share_code_type' : form.share_code_type.data,
+            'event_lab_season' : form.event_lab_season.data,
+            'event_lab_racing_series' : form.event_lab_racing_series.data, 
             'preview_img_url' : form.preview_img_url.data,
             'embed_yt_url' : form.yt_video_url.data,
             'description' : form.description.data,

@@ -1,27 +1,46 @@
 {% extends 'layout.html' %}
 
 {% block body%}
+    <script>
+        function yesnoCheck(that) {
+            if (that.value == "event_lab") {
+                //alert("Enter the Event Lab details like Season and Racing series");
+                document.getElementById("event-lab-sub-fields").style.display = "block";
+            } else {
+                document.getElementById("event-lab-sub-fields").style.display = "none";
+            }
+        }
+    </script>
+
+
     <div class="container mb-8">
         <h1 class="mb-8">Make Your Submission</h1>
         <div class="container mt-5">
             {% from "includes/_formhelpers.html" import render_field %}
             <form method="POST" action="">
-                <div class="form-group">
+                <div class="form-group" style="font-weight: 600;">
                     {{ render_field(form.share_code, class="form-control mb-3") }}
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="font-weight: 600;">
                     {{ render_field(form.title, class="form-control mb-3") }}
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="font-weight: 600;">
                     {{ render_field(form.game, class="form-control mb-3") }}
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="font-weight: 600;">
+                    {{ render_field(form.share_code_type, class="form-control mb-3", onchange="yesnoCheck(this);") }}
+                </div>
+                <div class="form-group" id="event-lab-sub-fields" style="display: none; font-weight: 600;")>
+                    {{ render_field(form.event_lab_season, class="form-control mb-3") }}
+                    {{ render_field(form.event_lab_racing_series, class="form-control mb-3") }}
+                </div>
+                <div class="form-group" style="font-weight: 600;">
                     {{ render_field(form.preview_img_url, class="form-control mb-3") }}
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="font-weight: 600;">
                     {{ render_field(form.yt_video_url, class="form-control mb-3") }}
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="font-weight: 600;">
                     {{ render_field(form.description, class="form-control mb-3") }}
                 </div>
                 <p><input type="submit" value="Submit" class="btn btn-primary"></p>
