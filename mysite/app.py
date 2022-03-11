@@ -1,5 +1,6 @@
 # Import core libraries
 import datetime
+from turtle import title
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
 from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
@@ -42,13 +43,40 @@ def index():
 def explore():
     return render_template("explore.html", share_codes_data=share_codes_data) # show top picks of the day, week, month, all-time
 
-@app.route("/search")
+# Create a Search Form using WTForms
+class SearchForm(Form):
+    game = SelectField('Game', choices=['forza_horizon_4', 'forza_horizon_5'], validators=[validators.input_required()])
+    title  = StringField('Title', validators=[validators.input_required(), validators.Length(min=1, max=50)])
+    share_code_type = SelectField('Share code type', choices=['Select', 'event_lab', 'vinyl_group', 'livery_design'], validators=[validators.input_required(), validators.Length(min=7)])
+    event_lab_season = SelectField('Season', choices=['Select', 'hot','wet','storm','dry'], validators=[validators.Optional()])
+    event_lab_racing_series = SelectField('Racing Series', choices=['Select', 'road','dirt','cross_country','drag'], validators=[validators.Optional()])
+    search_description = TextAreaField('Description will help in getting relevant results', validators=[validators.Optional(), validators.Length(max=300)])
+
+@app.route("/search", methods=['GET', 'POST'])
 def search():
-    return render_template("search.html") # basically a form that has all the input fields like in the game
+    form = SearchForm(request.form)
+    if request.method == 'POST' and form.validate():
+        search_query = {
+            'title': form.title.data,
+            'game' : form.game.data,
+            'share_code_type' : form.share_code_type.data,
+            'event_lab_season' : form.event_lab_season.data,
+            'event_lab_racing_series' : form.event_lab_racing_series.data,
+            'search_description': form.search_description.data.replace('.', ' ').split()
+        }
+        return redirect(url_for("results", search_query=search_query))
+    return render_template("search.html", form=form) # basically a form that has all the input fields like in the game
 
 @app.route("/results")
 def results():
-    return render_template("results.html", share_codes_data="dummy_data")
+    search_query = request.args.get('search_query', None)
+    # call the gcfsDB function here to get the results using search_query
+    # then pass this result to the results page as a list data
+    return render_template("results.html", search_query=search_query)
+
+@app.route("/view")
+def view_form(game, share_code):
+    return ('view form comes here...that you use to find a specific sharecode...this form will ask for only game name and sharecode field')
 
 @app.route("/view/<game>/<int:share_code>")
 def view_single_share_code(game, share_code):
