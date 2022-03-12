@@ -2,4 +2,11 @@
 
 {% block body%}
     {{ search_query }}
+    <br>
+    <br>
+    <ul class="list-group">
+    {% for result in search_results %}
+        <li class="list-group-item">{{ result }}</li>
+    {% endfor %}
+    </ul>
 {% endblock %}

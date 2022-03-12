@@ -1,9 +1,9 @@
 # Import core libraries
 import datetime
-from turtle import title
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
 from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
+import json
 
 # Import helper libraries and environment variables
 import _functions
@@ -45,11 +45,11 @@ def explore():
 
 # Create a Search Form using WTForms
 class SearchForm(Form):
-    game = SelectField('Game', choices=['forza_horizon_4', 'forza_horizon_5'], validators=[validators.input_required()])
-    share_code_type = SelectField('Share code type', choices=['Select', 'event_lab', 'vinyl_group', 'livery_design'], validators=[validators.input_required(), validators.Length(min=7)])
-    event_lab_season = SelectField('Season', choices=['Select', 'hot','wet','storm','dry'], validators=[validators.Optional()])
-    event_lab_racing_series = SelectField('Racing Series', choices=['Select', 'road','dirt','cross_country','drag'], validators=[validators.Optional()])
-    search_description = TextAreaField('Description will help in getting relevant results', validators=[validators.Optional(), validators.Length(max=300)])
+    game = SelectField('Game', choices=[(False, 'Select'), ('forza_horizon_4', 'Forza Horizon 4'), ('forza_horizon_5', 'Forza Horizon 5')], validators=[validators.DataRequired()])
+    share_code_type = SelectField('Share code type', choices=[(False, 'Select'), ('event_lab', 'Event Lab'), ('vinyl_group', 'Vinyl Group'), ('livery_design', 'Livery Design')], validators=[validators.DataRequired()])
+    event_lab_season = SelectField('Season', choices=[('all', 'All'), ('hot', 'Hot'), ('wet', 'Wet'), ('storm', 'Storm'), ('dry', 'Dry')], validators=[validators.Optional()])
+    event_lab_racing_series = SelectField('Racing Series', choices=[('all', 'All'), ('road', 'Road'), ('dirt', 'Dirt'), ('cross_country', 'Cross Country'), ('drag', 'Drag')], validators=[validators.Optional()])
+    search_description = TextAreaField('Description will help in getting relevant results', validators=[validators.InputRequired(), validators.Length(min=10, max=300)])
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
@@ -62,34 +62,34 @@ def search():
             'event_lab_racing_series' : form.event_lab_racing_series.data if form.share_code_type.data == 'event_lab' else None,
             'search_description': form.search_description.data.replace('.', ' ').split()
         }
+        search_query = json.dumps(search_query)
         return redirect(url_for("results", search_query=search_query))
     return render_template("search.html", form=form) # basically a form that has all the input fields like in the game
 
 @app.route("/results")
 def results():
-    search_query = request.args.get('search_query', None)
-    # call the gcfsDB function here to get the results using search_query
-    # then pass this result to the results page as a list data
-    return render_template("results.html", search_query=search_query)
+    search_query = request.args.get('search_query')
+    search_query = json.loads(search_query)
+    search_results = gcfsDB.get_search_results(search_query)
+    return render_template("results.html", search_query=search_query, search_results=search_results)
 
 @app.route("/view/<game>/<int:share_code>")
 def view_single_share_code(game, share_code):
     single_share_code = gcfsDB.get_single_share_code_data(game=game, share_code=share_code)
     print(single_share_code)
-    return render_template('view_share_code.html', share_codes_data=single_share_code)
+    return render_template('view_share_code.html', share_codes_data=single_share_code),
 
 # Create a Submission Form using WTForms
 class SubmissionForm(Form):
-    share_code = IntegerField('Share code', validators=[validators.input_required(), validators.NumberRange(min=100000000, max=999999999)])
-    title  = StringField('Title', validators=[validators.input_required(), validators.Length(min=5, max=50)])
-    game = SelectField('Game', choices=['forza_horizon_4', 'forza_horizon_5'], validators=[validators.input_required()])
-    share_code_type = SelectField('Share code type', choices=['Select', 'event_lab', 'vinyl_group', 'livery_design'], validators=[validators.input_required(), validators.Length(min=7)])
-    event_lab_season = SelectField('Season', choices=['Select', 'hot','wet','storm','dry'], validators=[validators.Optional()])
-    event_lab_racing_series = SelectField('Racing Series', choices=['Select', 'road','dirt','cross_country','drag'], validators=[validators.Optional()])
-    
-    preview_img_url = StringField('Preview Image URL', validators=[validators.optional(), validators.Length(max=600)])
-    yt_video_url = StringField('YouTube Video URL', validators=[validators.optional(), validators.Length(max=100)])
-    description = TextAreaField('Tell why would people enjoy your share code', validators=[validators.input_required(), validators.Length(min=10, max=300)])
+    share_code = IntegerField('Share code', validators=[validators.InputRequired(), validators.NumberRange(min=100000000, max=999999999)])
+    title  = StringField('Title', validators=[validators.InputRequired(), validators.Length(min=5, max=50)])
+    game = SelectField('Game', choices=[(False, 'Select'), ('forza_horizon_4', 'Forza Horizon 4'), ('forza_horizon_5', 'Forza Horizon 5')], validators=[validators.DataRequired()])
+    share_code_type = SelectField('Share code type', choices=[(False, 'Select'), ('event_lab', 'Event Lab'), ('vinyl_group', 'Vinyl Group'), ('livery_design', 'Livery Design')], validators=[validators.DataRequired()])
+    event_lab_season = SelectField('Season', choices=[('all', 'All'), ('hot', 'Hot'), ('wet', 'Wet'), ('storm', 'Storm'), ('dry', 'Dry')], validators=[validators.Optional()])
+    event_lab_racing_series = SelectField('Racing Series', choices=[('all', 'All'), ('road', 'Road'), ('dirt', 'Dirt'), ('cross_country', 'Cross Country'), ('drag', 'Drag')], validators=[validators.Optional()])
+    preview_img_url = StringField('Preview Image URL', validators=[validators.Optional(), validators.Length(max=600)])
+    yt_video_url = StringField('YouTube Video URL', validators=[validators.Optional(), validators.Length(max=100)])
+    description = TextAreaField('Tell why would people enjoy your share code', validators=[validators.InputRequired(), validators.Length(min=10, max=300)])
 
 @app.route("/submit", methods=['GET', 'POST'])
 @is_logged_in
