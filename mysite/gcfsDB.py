@@ -46,3 +46,6 @@ def check_and_add_share_code_gcfsDB(share_code_candidate):
     else:
         doc_ref = gcfsDB.collection('share_codes')
         doc_ref.add(share_code_candidate)
+
+def get_search_results():
+    pass
