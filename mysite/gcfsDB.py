@@ -53,6 +53,17 @@ def get_single_share_code_data(game, share_code):
 
 
 def get_search_results(search_query):
+    def description_score(description_tokens, result_candidate):
+        results = []
+        for result in result_candidate:
+            description_score = 0
+            for token in description_tokens:
+                if result['description'].find(token) != -1:
+                    description_score = description_score + 1
+            result['description_score'] = description_score
+            results.append(result)
+        return results
+    
     if search_query['share_code_type'] == 'vinyl_group':
         docs = gcfsDB.collection('share_codes')\
                 .where('game', '==', search_query['game'])\
@@ -93,9 +104,10 @@ def get_search_results(search_query):
                 .where('event_lab_racing_series', '==', search_query['event_lab_racing_series'])\
                 .stream()
 
-    results = []
+    results_candidate = []
     if docs:
         for item in docs:
-            results.append(item.to_dict())
+            results_candidate.append(item.to_dict())
+        results = description_score(search_query['search_description'], results_candidate)
         return results
     return False
