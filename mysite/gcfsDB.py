@@ -3,6 +3,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
+from datetime import datetime, timedelta, timezone
+
 # Initialise the Firebase firestore database using service account credentials
 if not firebase_admin._apps:
     cred = credentials.Certificate('env_vars/fhsc-database-3ab0770b0616.json')
@@ -17,7 +19,9 @@ def set_user_data_gcfsDB(user_data):
             'unique_id': user_data['unique_id'],
             'users_name': user_data['users_name'],
             'users_email': user_data['users_email'],
-            'picture': user_data['picture']
+            'picture': user_data['picture'],
+            'account_creation_timestamp': datetime.now(timezone.utc),
+            'last_upload_timestamp': datetime.now(timezone.utc) - timedelta(hours=24)
         }
     )
 
@@ -32,11 +36,29 @@ def if_user_data_exists_gcfsDB(user_data):
 
 
 def check_and_add_share_code_gcfsDB(share_code_candidate):
+    upload_time_diff = 0
+    doc = gcfsDB.collection('users').document(share_code_candidate['author_email']).get()
+    doc = doc.to_dict()
+    upload_time_diff = datetime.now(timezone.utc).astimezone() - doc['last_upload_timestamp']
+    print(type(upload_time_diff))
+
     if get_single_share_code_data(share_code_candidate['game'], share_code_candidate['share_code']):
-        return 'exists'
-    else:
+        return 'exists', upload_time_diff
+
+    if upload_time_diff.days < 1:
+        return 'not exists', upload_time_diff
+    
+    else:        
         doc_ref = gcfsDB.collection('share_codes')
         doc_ref.add(share_code_candidate)
+
+        doc_ref = gcfsDB.collection('users').document(share_code_candidate['author_email'])
+        doc_ref.update(
+            {
+                'last_upload_timestamp': datetime.now(timezone.utc)
+            }
+        )
+        return 'not exists', upload_time_diff
 
 
 def get_single_share_code_data(game, share_code):

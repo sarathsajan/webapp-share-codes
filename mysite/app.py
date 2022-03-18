@@ -1,5 +1,5 @@
 # Import core libraries
-import datetime
+from datetime import datetime, timezone
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
 from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
@@ -107,12 +107,19 @@ def submit():
             'embed_yt_url' : form.yt_video_url.data,
             'description' : form.description.data,
             'author': session['user_data']['users_name'],
-            'date': datetime.datetime.now(),
+            'author_email': session['user_data']['users_email'],
+            'date': datetime.now(timezone.utc).astimezone(),
+            'upvote_list': [session['user_data']['users_email']],
+            'downvote_list':[]
         }
-        submit_flag = gcfsDB.check_and_add_share_code_gcfsDB(share_code_candidate)
+        submit_flag, upload_time_diff = gcfsDB.check_and_add_share_code_gcfsDB(share_code_candidate)
         if submit_flag == 'exists':
             flash('That share code already exists', category='danger')
             return redirect(url_for('submit'))
+
+        if upload_time_diff.days < 1 :
+            flash(f'Wait for {23 - upload_time_diff.seconds//3600} hour(s) and {60 - (upload_time_diff.seconds//60)%60} minute(s) before posting a new share code', category='danger')
+            return redirect(url_for("profile_myself"))
         else:
             flash('Your share code has been added', category='success')
             return redirect(url_for("profile_myself"))
