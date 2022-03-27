@@ -136,14 +136,14 @@ def login():
 
 @app.route("/login/callback")
 def callback():
-    # Get authorization code Google sent back to you
+    # Get the authorization code that Google sent back to you
     code = request.args.get("code")
     user_data = g_auth_session.start_google_authentication(request, code)
 
     if not user_data['msg']:
         return ('Google Authentication Error')
     
-    # Doesn't exist? Add it to the database.
+    # User doesn't exist? Add it to the database.
     if not gcfsDB.if_user_data_exists_gcfsDB(user_data):
         gcfsDB.set_user_data_gcfsDB(user_data)
 
@@ -157,7 +157,8 @@ def callback():
 @app.route("/profile/myself")
 @is_logged_in
 def profile_myself():
-    return render_template('profile.html')
+    user_submitted_share_codes = gcfsDB.get_user_submitted_share_codes(session['user_data']['users_email'])
+    return render_template('profile.html', user_submitted_share_codes=user_submitted_share_codes)
 
 
 @app.route("/logout")

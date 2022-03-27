@@ -133,3 +133,13 @@ def get_search_results(search_query):
         results = description_score(search_query['search_description'], results_candidate)
         return results
     return False
+
+def get_user_submitted_share_codes(author_email):
+    doc_ref = gcfsDB.collection('share_codes')
+    docs = doc_ref.where('author_email', '==', author_email).stream()
+    results = []
+    if docs:
+        for item in docs:
+            results.append(item.to_dict())
+        return results
+    return False

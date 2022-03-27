@@ -15,9 +15,24 @@
         <div class="container">
             <div class="container p-5 mb-4 bg-light rounded-3">
                 <p class="display-6">My Submissions</p>
-                <p class="col-md-8">Creations: 61</p>
-                <p class="col-md-8">Followers: 584</p>
-                <p class="col-md-8">Following: 12</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Share code</th>
+                            <th scope="col">Title</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for result in user_submitted_share_codes %}
+                        <tr>
+                            <td>{{ result['share_code'] }}</td>
+                            <td>{{ result['title'] }}</td>
+                            <td><a href="/view/{{ result['game'] }}/{{ result['share_code'] }}">more details</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="container">
@@ -30,7 +45,7 @@
         </div>
     {% else %}
         <div class="container">
-            <p> Please <a href="/authenticate">click here authenticate</a>, to view 'My Profile'</p>
+            <p> Please <a href="/authenticate">click here and authenticate</a>, to view your profile</p>
         </div>
     {% endif %}
 
