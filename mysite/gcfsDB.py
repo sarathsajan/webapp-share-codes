@@ -73,6 +73,13 @@ def get_single_share_code_data(game, share_code):
         return results
     return False
 
+def delete_share_code(game, share_code):
+    docs = gcfsDB.collection('share_codes').where('game', '==', game).where('share_code', '==', share_code).stream()
+    for item in docs:
+        item.reference.delete()
+
+    
+
 
 def get_search_results(search_query):
     def description_score(description_tokens, result_candidate):

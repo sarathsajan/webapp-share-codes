@@ -18,6 +18,24 @@
                     <p>Upvotes: {{ share_codes_data[0]['upvotes']|length }}</p>
                     <p>Downvotes: {{ share_codes_data[0]['downvotes']|length }}</p>
                     <p>Views: {{ share_codes_data[0]['views'] }}</p>
+                    {% if session.logged_in %}
+                        {% if session['user_data']['users_email'] == share_codes_data[0]['author_email'] %}
+                            <div class="container mb-8">
+                                <div class="container mt-5">
+                                    {% from "includes/_formhelpers.html" import render_field %}
+                                    <form method="POST" action="{{ url_for('profile_myself') }}">
+                                        <div class="form-group">
+                                            {{ render_field(form.share_code, class="form-control mb-3", type="hidden", value=share_codes_data[0]['share_code']) }}
+                                        </div>
+                                        <div class="form-group">
+                                            {{ render_field(form.game, class="form-control mb-3", type="hidden", value=share_codes_data[0]['game']) }}
+                                        </div>
+                                        <p><input type="submit" value="Delete" class="btn btn-danger"></p>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
                 </div>
                 <div class="col">
                     <iframe class="border rounded-3 shadow-lg mb-4" width="420" height="315" src="{{ 'https://youtube.com/embed/'+share_codes_data[0]['embed_yt_url'][32:] }}"></iframe>
