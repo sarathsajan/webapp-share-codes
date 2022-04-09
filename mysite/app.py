@@ -83,7 +83,7 @@ class DeletionForm(Form):
 @app.route("/view/<game>/<int:share_code>")
 def view_single_share_code(game, share_code):
     form = DeletionForm(request.form)
-    single_share_code = gcfsDB.get_single_share_code_data(game=game, share_code=share_code)
+    single_share_code = gcfsDB.get_single_share_code_data(game=game, share_code=share_code, view_count=1)
     print(single_share_code)
     return render_template('view_share_code.html', share_codes_data=single_share_code, form=form)
 
