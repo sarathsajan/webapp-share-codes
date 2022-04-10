@@ -15,20 +15,23 @@
                     <p>Description: {{ share_codes_data[0]['description'] }}</p>
                     <p>Author: {{ share_codes_data[0]['author'] }}</p>
                     <p>Date: {{ share_codes_data[0]['date'].date() }}</p>
-                    <p>Upvotes: {{ share_codes_data[0]['upvotes']|length }}</p>
-                    <p>Downvotes: {{ share_codes_data[0]['downvotes']|length }}</p>
+                    <p>Upvotes: {{ share_codes_data[0]['upvote_list']|length }}</p>
+                    <p>Downvotes: {{ share_codes_data[0]['downvote_list']|length }}</p>
                     <p>Views: {{ share_codes_data[0]['views'] }}</p>
                     {% if session.logged_in %}
                         {% if session['user_data']['users_email'] == share_codes_data[0]['author_email'] %}
                             <div class="container mb-8">
                                 <div class="container mt-5">
                                     {% from "includes/_formhelpers.html" import render_field %}
-                                    <form method="POST" action="{{ url_for('profile_myself') }}">
+                                    <form method="POST" action="">
                                         <div class="form-group">
                                             {{ render_field(form.share_code, class="form-control mb-3", type="hidden", value=share_codes_data[0]['share_code']) }}
                                         </div>
                                         <div class="form-group">
                                             {{ render_field(form.game, class="form-control mb-3", type="hidden", value=share_codes_data[0]['game']) }}
+                                        </div>
+                                        <div class="form-group">
+                                            {{ render_field(form.author_email, class="form-control mb-3", type="hidden", value=share_codes_data[0]['author_email']) }}
                                         </div>
                                         <p><input type="submit" value="Delete" class="btn btn-danger"></p>
                                     </form>
@@ -42,7 +45,7 @@
                 </div>
             </div>
         {% else %}
-            <p>Oops! Share-Code not available in our system.</p>
+            <p>Oops! That share code not available in our system currently.</p>
         {% endif %}
     </div>
 {% endblock %}

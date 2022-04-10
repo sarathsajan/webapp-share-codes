@@ -75,8 +75,11 @@ def get_single_share_code_data(game, share_code, view_count=0):
         return results
     return False
 
-def delete_share_code(game, share_code):
-    docs = gcfsDB.collection('share_codes').where('game', '==', game).where('share_code', '==', share_code).stream()
+def delete_share_code(game, share_code, author_email):
+    docs = gcfsDB.collection('share_codes')\
+        .where('game', '==', game)\
+        .where('share_code', '==', share_code)\
+        .where('author_email', '==', author_email).stream()
     for item in docs:
         item.reference.delete()
 

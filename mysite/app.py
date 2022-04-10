@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from operator import methodcaller
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
-from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
+from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField, EmailField
 import json
 
 # Import helper libraries and environment variables
@@ -77,14 +77,19 @@ def results():
 
 # Create a Deletion Form using WTForms
 class DeletionForm(Form):
-    share_code = IntegerField('')
-    game = StringField('')
+    share_code = IntegerField('', validators=[validators.InputRequired(), validators.NumberRange(min=100000000, max=999999999)])
+    game = StringField('', validators=[validators.InputRequired(), validators.Length(min=10, max=20)])
+    author_email = EmailField('', validators=[validators.InputRequired(), validators.Email()])
 
-@app.route("/view/<game>/<int:share_code>")
+@app.route("/view/<game>/<int:share_code>", methods=['GET', 'POST'])
 def view_single_share_code(game, share_code):
     form = DeletionForm(request.form)
+    if request.method == 'POST' and form.validate() and session['user_data']['users_email'] == form.author_email.data:
+        gcfsDB.delete_share_code(form.game.data, form.share_code.data, form.author_email.data)
+        flash('Your share code has been deleted', category='warning')
+        return redirect(url_for("profile_myself"))
     single_share_code = gcfsDB.get_single_share_code_data(game=game, share_code=share_code, view_count=1)
-    print(single_share_code)
+    # print(single_share_code)
     return render_template('view_share_code.html', share_codes_data=single_share_code, form=form)
 
 # Create a Submission Form using WTForms
@@ -162,14 +167,9 @@ def callback():
     # Send user to profile page
     return redirect(url_for("profile_myself"))
 
-@app.route("/profile/myself", methods=['GET', 'POST'])
+@app.route("/profile/myself")
 @is_logged_in
 def profile_myself():
-    form = DeletionForm(request.form)
-    if request.method == 'POST' and form.validate():
-        gcfsDB.delete_share_code(form.game.data, form.share_code.data)
-        flash('Your share code has been deleted', category='warning')
-        return redirect(url_for("profile_myself"))
     user_submitted_share_codes = gcfsDB.get_user_submitted_share_codes(session['user_data']['users_email'])
     return render_template('profile.html', user_submitted_share_codes=user_submitted_share_codes)
 
