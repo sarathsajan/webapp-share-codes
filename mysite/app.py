@@ -1,9 +1,8 @@
 # Import core libraries
 from datetime import datetime, timezone
-from operator import methodcaller
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
-from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField, EmailField
+from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
 import json
 
 # Import helper libraries and environment variables
@@ -79,7 +78,7 @@ def results():
 class DeletionForm(Form):
     share_code = IntegerField('', validators=[validators.InputRequired(), validators.NumberRange(min=100000000, max=999999999)])
     game = StringField('', validators=[validators.InputRequired(), validators.Length(min=10, max=20)])
-    author_email = EmailField('', validators=[validators.InputRequired(), validators.Email()])
+    author_email = StringField('', validators=[validators.InputRequired(), validators.Length(min=7)])
 
 @app.route("/view/<game>/<int:share_code>", methods=['GET', 'POST'])
 def view_single_share_code(game, share_code):
