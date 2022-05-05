@@ -18,20 +18,48 @@
                     <p>Upvotes: {{ share_codes_data[0]['upvote_list']|length }}</p>
                     <p>Downvotes: {{ share_codes_data[0]['downvote_list']|length }}</p>
                     <p>Views: {{ share_codes_data[0]['views'] }}</p>
+                    <p>Upvotes: {{ share_codes_data[0]['upvotes']|length }}</p>
+                    <p>Downvotes: {{ share_codes_data[0]['downvotes']|length }}</p>
+                    <p>Please Log in to rate this sharecode</p>
                     {% if session.logged_in %}
+                        {% if session['user_data']['users_email'] in share_codes_data[0]['upvotes'] %}
+                            <p>You have upvoted this share code</p>
+                        {% endif %}
+                        {% if session['user_data']['users_email'] in share_codes_data[0]['downvotes'] %}
+                            <p>You have downvoted this share code</p>
+                        {% endif %}
+                    <div class="container mb-8">
+                        <div class="container mt-5">
+                            {% from "includes/_formhelpers.html" import render_field %}
+                            <form method="POST" action="">
+                                <div class="form-group">
+                                    {{ render_field(rating_form.rating, class="form-control mb-3")}}
+                                </div>
+                                <div class="form-group">
+                                    {{ render_field(rating_form.share_code, class="form-control mb-3", type="hidden", value=share_codes_data[0]['share_code']) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ render_field(rating_form.game, class="form-control mb-3", type="hidden", value=share_codes_data[0]['game']) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ render_field(rating_form.users_email, class="form-control mb-3", type="hidden", value=session['user_data']['users_email']) }}
+                                </div>
+                                <p><input type="submit" value="Submit" class="btn btn-primary"></p>
+                            </form>
+                        </div>
                         {% if session['user_data']['users_email'] == share_codes_data[0]['author_email'] %}
                             <div class="container mb-8">
                                 <div class="container mt-5">
                                     {% from "includes/_formhelpers.html" import render_field %}
                                     <form method="POST" action="">
                                         <div class="form-group">
-                                            {{ render_field(form.share_code, class="form-control mb-3", type="hidden", value=share_codes_data[0]['share_code']) }}
+                                            {{ render_field(deletion_form.share_code, class="form-control mb-3", type="hidden", value=share_codes_data[0]['share_code']) }}
                                         </div>
                                         <div class="form-group">
-                                            {{ render_field(form.game, class="form-control mb-3", type="hidden", value=share_codes_data[0]['game']) }}
+                                            {{ render_field(deletion_form.game, class="form-control mb-3", type="hidden", value=share_codes_data[0]['game']) }}
                                         </div>
                                         <div class="form-group">
-                                            {{ render_field(form.author_email, class="form-control mb-3", type="hidden", value=share_codes_data[0]['author_email']) }}
+                                            {{ render_field(deletion_form.author_email, class="form-control mb-3", type="hidden", value=share_codes_data[0]['author_email']) }}
                                         </div>
                                         <p><input type="submit" value="Delete" class="btn btn-danger"></p>
                                     </form>

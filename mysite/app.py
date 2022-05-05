@@ -1,8 +1,9 @@
 # Import core libraries
 from datetime import datetime, timezone
+from email.policy import default
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
-from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField
+from wtforms import Form, validators, StringField, TextAreaField, SelectField, IntegerField, RadioField
 import json
 
 # Import helper libraries and environment variables
@@ -73,6 +74,13 @@ def results():
     search_results = gcfsDB.get_search_results(search_query)
     return render_template("results.html", search_query=search_query, search_results=search_results)
 
+# Create a Like/Dislike Form using WTForms
+class RatingForm(Form):
+    rating = RadioField('Rating', choices=[(0, 'Neutral'), (1, 'Upvote 👍'), (-1, "Downvote 👎")], default=0 , validators=[validators.DataRequired()])
+    share_code = IntegerField('', validators=[validators.InputRequired(), validators.NumberRange(min=100000000, max=999999999)])
+    game = StringField('', validators=[validators.InputRequired(), validators.Length(min=10, max=20)])
+    users_email = StringField('', validators=[validators.InputRequired(), validators.Length(min=7)])
+
 
 # Create a Deletion Form using WTForms
 class DeletionForm(Form):
@@ -82,14 +90,24 @@ class DeletionForm(Form):
 
 @app.route("/view/<game>/<int:share_code>", methods=['GET', 'POST'])
 def view_single_share_code(game, share_code):
-    form = DeletionForm(request.form)
-    if request.method == 'POST' and form.validate() and session['user_data']['users_email'] == form.author_email.data:
-        gcfsDB.delete_share_code(form.game.data, form.share_code.data, form.author_email.data)
-        flash('Your share code has been deleted', category='warning')
+    rating_form = RatingForm(request.form)
+    deletion_form = DeletionForm(request.form)
+
+    if request.method == 'POST' and rating_form.validate() and 'logged_in' in session:
+        rate_submit_flag = gcfsDB.rate_share_code(rating_form.rating.data, rating_form.game.data, rating_form.share_code.data, rating_form.users_email.data)
+        if rate_submit_flag == False:
+            flash("There was an error rating this share code", category="danger")
+            return redirect(url_for("view_single_share_code", game=game, share_code=share_code))
+        flash('You have rated the sharecode', category='success')
+        return redirect(url_for("view_single_share_code", game=game, share_code=share_code))
+    
+    if request.method == 'POST' and deletion_form.validate() and session['user_data']['users_email'] == deletion_form.author_email.data:
+        gcfsDB.delete_share_code(deletion_form.game.data, deletion_form.share_code.data, deletion_form.author_email.data)
+        flash('Your share code has been deleted', category='danger')
         return redirect(url_for("profile_myself"))
     single_share_code = gcfsDB.get_single_share_code_data(game=game, share_code=share_code, view_count=1)
     # print(single_share_code)
-    return render_template('view_share_code.html', share_codes_data=single_share_code, form=form)
+    return render_template('view_share_code.html', share_codes_data=single_share_code, rating_form=rating_form, deletion_form=deletion_form)
 
 # Create a Submission Form using WTForms
 class SubmissionForm(Form):
@@ -121,7 +139,7 @@ def submit():
             'author': session['user_data']['users_name'],
             'author_email': session['user_data']['users_email'],
             'date': datetime.now(timezone.utc).astimezone(),
-            'upvote_list': [session['user_data']['users_email']],
+            'upvote_list': [],
             'downvote_list':[]
         }
         submit_flag, upload_time_diff = gcfsDB.check_and_add_share_code_gcfsDB(share_code_candidate)
@@ -130,7 +148,7 @@ def submit():
             return redirect(url_for('submit'))
 
         if upload_time_diff.days < 1 :
-            flash(f'Wait for {23 - upload_time_diff.seconds//3600} hour(s) and {60 - (upload_time_diff.seconds//60)%60} minute(s) before posting a new share code', category='danger')
+            flash(f"Right now, I don't know how to implement captcha to fight bots, so please wait for {23 - upload_time_diff.seconds//3600} hour(s) and {60 - (upload_time_diff.seconds//60)%60} minute(s) before posting a new share code", category='danger')
             return redirect(url_for("profile_myself"))
         else:
             flash('Your share code has been added', category='success')

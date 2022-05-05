@@ -9,7 +9,8 @@
                 <th scope="col">Share code</th>
                 <th scope="col">Title</th>
                 <th scope="col">Author</th>
-                <th scope="col">Like <i class="bi bi-hand-thumbs-up-fill"></i> / Dislike <i class="bi bi-hand-thumbs-down-fill"></i></th>
+                <th scope="col">Upvotes 👍</th>
+                <th scope="col">Downvotes 👎</th>
                 <th scope="col">Relevancy Score</th>
               </tr>
             </thead>
@@ -19,7 +20,8 @@
                 <td>{{ result['share_code'] }}</td>
                 <td>{{ result['title'] }}</td>
                 <td>{{ result['author'] }}</td>
-                <td>feature coming soon...</td>
+                <td>{{ result['upvotes'] }}</td>
+                <td>{{ result['downvotes'] }}</td>
                 <td>{{ result['description_score'] }}</td>
                 <td><a href="/view/{{ result['game'] }}/{{ result['share_code'] }}">more details</a></td>
               </tr>

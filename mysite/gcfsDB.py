@@ -75,6 +75,38 @@ def get_single_share_code_data(game, share_code, view_count=0):
         return results
     return False
 
+def rate_share_code(rating, game, share_code, users_email):
+    docs = gcfsDB.collection('share_codes').where('game', '==', game).where('share_code', '==', share_code).stream()
+    for item in docs:
+        if rating == '0':
+            item.reference.update(
+                {
+                    "upvotes": firestore.ArrayRemove([users_email]),
+                    "downvotes": firestore.ArrayRemove([users_email])                  
+                }
+            )
+            return True
+        elif rating == '1':
+            item.reference.update(
+                {
+                    "upvotes": firestore.ArrayUnion([users_email]),
+                    "downvotes": firestore.ArrayRemove([users_email])
+                }
+            )
+            return True
+        elif rating == '-1':
+            item.reference.update(
+                {
+                    "upvotes": firestore.ArrayRemove([users_email]),
+                    "downvotes": firestore.ArrayUnion([users_email])
+                }
+            )
+            return True
+        else:
+            return False
+
+
+
 def delete_share_code(game, share_code, author_email):
     docs = gcfsDB.collection('share_codes')\
         .where('game', '==', game)\
